@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Adjective vs Adverb Quiz</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9fafb;
+      padding: 2rem;
+      color: #1f2937;
+    }
+
+    .quiz-box {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .question {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f3f4f6;
+      cursor: pointer;
+    }
+
+    .options button.correct {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .options button.wrong {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #7f1d1d;
+    }
+
+    .explanation {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: #f0fdf4;
+      border-left: 4px solid #10b981;
+      display: none;
+    }
+
+    .next-btn,
+    #restartBtn {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 2rem;
+    }
+
+    #timerDisplay {
+      margin-bottom: 1rem;
+      font-weight: bold;
+      color: #2563eb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="quiz-box">
+    <div id="timerDisplay">⏱️ 剩余时间：60 秒</div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <button class="next-btn" id="nextBtn">下一题</button>
+    <div class="result" id="result"></div>
+    <button id="restartBtn">重新开始</button>
+  </div>
+
+  <script>
+const questions = [
+  // angry/angrily
+  {
+    sentence: "She shouted ____ at the dog.",
+    options: ["angry", "angrily", "angrier", "more angrily"],
+    answer: "angrily",
+    explanation: "描述“喊叫”的方式，用副词 angrily 修饰动词 shouted。"
+  },
+  {
+    sentence: "She gave me an ____ look.",
+    options: ["angry", "angrily", "angrier", "more angrily"],
+    answer: "angry",
+    explanation: "修饰名词 look，用形容词 angry。"
+  },
+  {
+    sentence: "The cat was ____ than the dog.",
+    options: ["angry", "angrily", "angrier", "more angrily"],
+    answer: "angrier",
+    explanation: "比较两只动物的状态，用比较级形容词 angrier。"
+  },
+  {
+    sentence: "The teacher shouted ____ than her.",
+    options: ["angry", "angrily", "angrier", "more angrily"],
+    answer: "more angrily",
+    explanation: "比较两个人的动作方式，用比较级副词 more angrily。"
+  },
+
+  // bad/badly
+  {
+    sentence: "He performed ____ in the exam.",
+    options: ["bad", "badly", "worse", "more badly"],
+    answer: "badly",
+    explanation: "描述“表现”的方式，用副词 badly 修饰动词 performed。"
+  },
+  {
+    sentence: "That was a ____ idea.",
+    options: ["bad", "badly", "worse", "more badly"],
+    answer: "bad",
+    explanation: "修饰名词 idea，用形容词 bad。"
+  },
+  {
+    sentence: "This idea is ____ than the last one.",
+    options: ["bad", "badly", "worse", "more badly"],
+    answer: "worse",
+    explanation: "比较两个想法的质量，用比较级形容词 worse。"
+  },
+  {
+    sentence: "He performed ____ than yesterday.",
+    options: ["bad", "badly", "worse", "more badly"],
+    answer: "worse",
+    explanation: "比较两次表现，用不规则比较级副词 worse。"
+  },
+
+  // beautiful/beautifully
+  {
+    sentence: "She dances ____ on stage.",
+    options: ["beautiful", "beautifully", "more beautiful", "more beautifully"],
+    answer: "beautifully",
+    explanation: "描述“跳舞”的方式，用副词 beautifully 修饰动词 dances。"
+  },
+  {
+    sentence: "It’s a ____ painting.",
+    options: ["beautiful", "beautifully", "more beautiful", "more beautifully"],
+    answer: "beautiful",
+    explanation: "修饰名词 painting，用形容词 beautiful。"
+  },
+  {
+    sentence: "This painting is ____ than that one.",
+    options: ["beautiful", "beautifully", "more beautiful", "more beautifully"],
+    answer: "more beautiful",
+    explanation: "比较两幅画的外观，用比较级形容词 more beautiful。"
+  },
+  {
+    sentence: "She dances ____ than her sister.",
+    options: ["beautiful", "beautifully", "more beautiful", "more beautifully"],
+    answer: "more beautifully",
+    explanation: "比较两人的舞蹈方式，用比较级副词 more beautifully。"
+  },
+
+  // fast/fast
+  {
+    sentence: "He drives a ____ car.",
+    options: ["fast", "fastly", "faster", "more fastly"],
+    answer: "fast",
+    explanation: "修饰名词 car，用形容词 fast。"
+  },
+  {
+    sentence: "He runs ____ in the race.",
+    options: ["fast", "fastly", "faster", "more fastly"],
+    answer: "fast",
+    explanation: "描述“跑”的方式，用副词 fast 修饰动词 runs。"
+  },
+  {
+    sentence: "This car is ____ than that one.",
+    options: ["fast", "fastly", "faster", "more fastly"],
+    answer: "faster",
+    explanation: "比较两辆车的速度，用比较级形容词 faster。"
+  },
+  {
+    sentence: "He runs ____ than his friend.",
+    options: ["fast", "fastly", "faster", "more fastly"],
+    answer: "faster",
+    explanation: "比较两人的跑步速度，用比较级副词 faster。"
+  },
+
+  // careful/carefully
+  {
+    sentence: "She completed the test ____.",
+    options: ["careful", "carefully", "more careful", "more carefully"],
+    answer: "carefully",
+    explanation: "描述“完成”的方式，用副词 carefully 修饰动词 completed。"
+  },
+  {
+    sentence: "She is a ____ student.",
+    options: ["careful", "carefully", "more careful", "more carefully"],
+    answer: "careful",
+    explanation: "修饰名词 student，用形容词 careful。"
+  },
+  {
+    sentence: "She is ____ than her classmates.",
+    options: ["careful", "carefully", "more careful", "more carefully"],
+    answer: "more careful",
+    explanation: "比较学生的特质，用比较级形容词 more careful。"
+  },
+  {
+    sentence: "She completed the test ____ than before.",
+    options: ["careful", "carefully", "more careful", "more carefully"],
+    answer: "more carefully",
+    explanation: "比较两次完成的方式，用比较级副词 more carefully。"
+  },
+
+  // loud/loudly
+  {
+    sentence: "He spoke ____ to get attention.",
+    options: ["loud", "loudly", "louder", "more loudly"],
+    answer: "loudly",
+    explanation: "描述“说话”的方式，用副词 loudly 修饰动词 spoke。"
+  },
+  {
+    sentence: "They heard a ____ noise.",
+    options: ["loud", "loudly", "louder", "more loudly"],
+    answer: "loud",
+    explanation: "修饰名词 noise，用形容词 loud。"
+  },
+  {
+    sentence: "The noise was ____ than yesterday.",
+    options: ["loud", "loudly", "louder", "more loudly"],
+    answer: "louder",
+    explanation: "比较两次噪音的程度，用比较级形容词 louder。"
+  },
+  {
+    sentence: "He spoke ____ than his friend.",
+    options: ["loud", "loudly", "louder", "more loudly"],
+    answer: "more loudly",
+    explanation: "比较两人的说话方式，用比较级副词 more loudly。"
+  },
+
+  // good/well
+  {
+    sentence: "He plays football ____.",
+    options: ["good", "well", "better", "more well"],
+    answer: "well",
+    explanation: "描述“踢球”的方式，用副词 well 修饰动词 plays。"
+  },
+  {
+    sentence: "He’s a ____ football player.",
+    options: ["good", "well", "better", "more well"],
+    answer: "good",
+    explanation: "修饰名词 player，用形容词 good。"
+  },
+  {
+    sentence: "He is a ____ player than before.",
+    options: ["good", "well", "better", "more well"],
+    answer: "better",
+    explanation: "比较球员的水平，用比较级形容词 better。"
+  },
+  {
+    sentence: "He plays football ____ than last year.",
+    options: ["good", "well", "better", "more well"],
+    answer: "better",
+    explanation: "比较两次踢球的方式，用比较级副词 better。"
+  },
+
+ // quiet/quietly/quieter/more quietly
+{
+  sentence: "It’s a ____ room.",
+  options: ["quiet", "quietly", "quieter", "more quietly"],
+  answer: "quiet",
+  explanation: "修饰名词 room，用形容词 quiet。"
+},
+{
+  sentence: "They entered the room ____.",
+  options: ["quiet", "quietly", "quieter", "more quietly"],
+  answer: "quietly",
+  explanation: "描述“进入”的方式，用副词 quietly 修饰动词 entered。"
+},
+{
+  sentence: "This room is ____ than the other one.",
+  options: ["quiet", "quietly", "quieter", "more quietly"],
+  answer: "quieter",
+  explanation: "比较两间房间的状态，用比较级形容词 quieter。"
+},
+{
+  sentence: "They entered the room ____ than before.",
+  options: ["quiet", "quietly", "quieter", "more quietly"],
+  answer: "more quietly",
+  explanation: "比较两次进入的方式，用比较级副词 more quietly。"
+},
+
+// happy/happily/happier/more happily
+{
+  sentence: "He is a ____ child.",
+  options: ["happy", "happily", "happier", "more happily"],
+  answer: "happy",
+  explanation: "修饰名词 child，用形容词 happy。"
+},
+{
+  sentence: "She smiled ____ at the baby.",
+  options: ["happy", "happily", "happier", "more happily"],
+  answer: "happily",
+  explanation: "描述“微笑”的方式，用副词 happily 修饰动词 smiled。"
+},
+{
+  sentence: "He is ____ than his brother.",
+  options: ["happy", "happily", "happier", "more happily"],
+  answer: "happier",
+  explanation: "比较两人的状态，用比较级形容词 happier。"
+},
+{
+  sentence: "She smiled ____ than yesterday.",
+  options: ["happy", "happily", "happier", "more happily"],
+  answer: "more happily",
+  explanation: "比较两次微笑的方式，用比较级副词 more happily。"
+},
+
+ 
+// dangerous/dangerously/more dangerous/more dangerously
+{
+  sentence: "It’s a ____ road.",
+  options: ["dangerous", "dangerously", "more dangerous", "more dangerously"],
+  answer: "dangerous",
+  explanation: "修饰名词 road，用形容词 dangerous。"
+},
+{
+  sentence: "He drives ____ on the highway.",
+  options: ["dangerous", "dangerously", "more dangerous", "more dangerously"],
+  answer: "dangerously",
+  explanation: "描述“驾驶”的方式，用副词 dangerously 修饰动词 drives。"
+},
+{
+  sentence: "This road is ____ than the other one.",
+  options: ["dangerous", "dangerously", "more dangerous", "more dangerously"],
+  answer: "more dangerous",
+  explanation: "比较两条路的状态，用比较级形容词 more dangerous。"
+},
+{
+  sentence: "He drives ____ than his brother.",
+  options: ["dangerous", "dangerously", "more dangerous", "more dangerously"],
+  answer: "more dangerously",
+  explanation: "比较两人的驾驶方式，用比较级副词 more dangerously。"
+},
+
+// soft/softly/softer/more softly
+{
+  sentence: "This is a ____ pillow.",
+  options: ["soft", "softly", "softer", "more softly"],
+  answer: "soft",
+  explanation: "修饰名词 pillow，用形容词 soft。"
+},
+{
+  sentence: "She whispered ____ to her friend.",
+  options: ["soft", "softly", "softer", "more softly"],
+  answer: "softly",
+  explanation: "描述“低语”的方式，用副词 softly 修饰动词 whispered。"
+},
+{
+  sentence: "This pillow is ____ than that one.",
+  options: ["soft", "softly", "softer", "more softly"],
+  answer: "softer",
+  explanation: "比较两只枕头的状态，用比较级形容词 softer。"
+},
+{
+  sentence: "She whispered ____ than yesterday.",
+  options: ["soft", "softly", "softer", "more softly"],
+  answer: "more softly",
+  explanation: "比较两次低语的方式，用比较级副词 more softly。"
+},
+
+// easy/easily/easier/more easily
+{
+  sentence: "It’s an ____ question.",
+  options: ["easy", "easily", "easier", "more easily"],
+  answer: "easy",
+  explanation: "修饰名词 question，用形容词 easy。"
+},
+{
+  sentence: "He completed the puzzle ____.",
+  options: ["easy", "easily", "easier", "more easily"],
+  answer: "easily",
+  explanation: "描述“完成”的方式，用副词 easily 修饰动词 completed。"
+},
+{
+  sentence: "This question is ____ than the last one.",
+  options: ["easy", "easily", "easier", "more easily"],
+  answer: "easier",
+  explanation: "比较两道题的难度，用比较级形容词 easier。"
+},
+{
+  sentence: "He completed the puzzle ____ than before.",
+  options: ["easy", "easily", "easier", "more easily"],
+  answer: "more easily",
+  explanation: "比较两次完成的方式，用比较级副词 more easily。"
+},
+ 
+// patient/patiently/more patient/more patiently
+{
+  sentence: "He is a ____ teacher.",
+  options: ["patient", "patiently", "more patient", "more patiently"],
+  answer: "patient",
+  explanation: "修饰名词 teacher，用形容词 patient。"
+},
+{
+  sentence: "She waited ____ for the bus.",
+  options: ["patient", "patiently", "more patient", "more patiently"],
+  answer: "patiently",
+  explanation: "描述“等待”的方式，用副词 patiently 修饰动词 waited。"
+},
+{
+  sentence: "He is ____ than his colleague.",
+  options: ["patient", "patiently", "more patient", "more patiently"],
+  answer: "more patient",
+  explanation: "比较两人的特质，用比较级形容词 more patient。"
+},
+{
+  sentence: "She waited ____ than yesterday.",
+  options: ["patient", "patiently", "more patient", "more patiently"],
+  answer: "more patiently",
+  explanation: "比较两次等待的方式，用比较级副词 more patiently。"
+},
+
+// simple/simply/simpler/more simply
+{
+  sentence: "It’s a ____ plan.",
+  options: ["simple", "simply", "simpler", "more simply"],
+  answer: "simple",
+  explanation: "修饰名词 plan，用形容词 simple。"
+},
+{
+  sentence: "He explained the rules ____.",
+  options: ["simple", "simply", "simpler", "more simply"],
+  answer: "simply",
+  explanation: "描述“解释”的方式，用副词 simply 修饰动词 explained。"
+},
+{
+  sentence: "This plan is ____ than the old one.",
+  options: ["simple", "simply", "simpler", "more simply"],
+  answer: "simpler",
+  explanation: "比较两种计划的复杂度，用比较级形容词 simpler。"
+},
+{
+  sentence: "He explained the rules ____ than before.",
+  options: ["simple", "simply", "simpler", "more simply"],
+  answer: "more simply",
+  explanation: "比较两次解释的方式，用比较级副词 more simply。"
+},
+
+// clear/clearly/clearer/more clearly
+{
+  sentence: "That is a ____ explanation.",
+  options: ["clear", "clearly", "clearer", "more clearly"],
+  answer: "clear",
+  explanation: "修饰名词 explanation，用形容词 clear。"
+},
+{
+  sentence: "He spoke ____ during the meeting.",
+  options: ["clear", "clearly", "clearer", "more clearly"],
+  answer: "clearly",
+  explanation: "描述“说话”的方式，用副词 clearly 修饰动词 spoke。"
+},
+{
+  sentence: "This explanation is ____ than the last one.",
+  options: ["clear", "clearly", "clearer", "more clearly"],
+  answer: "clearer",
+  explanation: "比较两次解释的质量，用比较级形容词 clearer。"
+},
+{
+  sentence: "He spoke ____ than yesterday.",
+  options: ["clear", "clearly", "clearer", "more clearly"],
+  answer: "more clearly",
+  explanation: "比较两次说话的方式，用比较级副词 more clearly。"
+},
+
+// hard/hardly/harder/more hardly
+{
+  sentence: "He worked ____ to finish on time.",
+  options: ["hard", "hardly", "harder", "more hardly"],
+  answer: "hard",
+  explanation: "描述“工作”的方式，用副词 hard 修饰动词 worked。"
+},
+{
+  sentence: "There is ____ any food left.",
+  options: ["hard", "hardly", "harder", "more hardly"],
+  answer: "hardly",
+  explanation: "hardly 表示几乎没有，用副词修饰数量。"
+},
+{
+  sentence: "He worked ____ than his classmates.",
+  options: ["hard", "hardly", "harder", "more hardly"],
+  answer: "harder",
+  explanation: "比较两人的工作努力程度，用比较级副词 harder。"
+},
+{
+  sentence: "He had ____ any time than before.",
+  options: ["hard", "hardly", "harder", "more hardly"],
+  answer: "hardly",
+  explanation: "hardly 没有比较级，仍表示几乎没有。"
+}
+ 
+  // ... continue for all other adjective/adverb pairs (quiet/quietly, happy/happily, dangerous/dangerously, soft/softly, easy/easily, patient/patiently, simple/simply, clear/clearly, hard/hardly, etc.)
+];
+
+    const shuffled = questions.sort(() => Math.random() - 0.5);
+    let current = 0;
+    let score = 0;
+    let attempted = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let quizEnded = false;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const explanationEl = document.getElementById('explanation');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultEl = document.getElementById('result');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const restartBtn = document.getElementById('restartBtn');
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `⏱️ 剩余时间：${timeLeft} 秒`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          quizEnded = true;
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      if (quizEnded || current >= shuffled.length) return;
+      const q = shuffled[current];
+      questionEl.textContent = `${current + 1}. ${q.sentence}`;
+      optionsEl.innerHTML = '';
+      explanationEl.style.display = 'none';
+      nextBtn.style.display = 'none';
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.addEventListener('click', () => {
+          if (quizEnded) return;
+          attempted++; // count this question as attempted
+          if (opt === q.answer) {
+            btn.classList.add('correct');
+            score++;
+          } else {
+            btn.classList.add('wrong');
+          }
+          explanationEl.textContent = q.explanation;
+          explanationEl.style.display = 'block';
+          nextBtn.style.display = 'inline-block';
+          Array.from(optionsEl.children).forEach(b => b.disabled = true);
+        });
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    nextBtn.addEventListener('click', () => {
+      current++;
+      if (quizEnded || current >= shuffled.length) {
+        endQuiz();
+      } else {
+        showQuestion();
+      }
+    });
+
+    function endQuiz() {
+      clearInterval(timerInterval);
+      quizEnded = true;
+      questionEl.style.display = 'none';
+      optionsEl.style.display = 'none';
+      explanationEl.style.display = 'none';
+      nextBtn.style.display = 'none';
+      resultEl.innerHTML = `🎉 你答对了 ${score} / ${attempted} 题！`;
+      restartBtn.style.display = 'inline-block';
+    }
+
+    restartBtn.addEventListener('click', () => {
+      location.reload();
+    });
+
+    // Start quiz
+    startTimer();
+    showQuestion();
+  </script>
+</body>
+
+</html>
